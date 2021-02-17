@@ -2,29 +2,42 @@
 from random import gauss
 
 
-class RandomFloat:    # создали класс. называем с большой буквы классы. перед классом 2 строки пустые
-    def __init__(self, mu: float, /, *, sigma: float = 1.):    # self - такая перемен которая дает возможность работать с объектом внутри функции
-           # self позволяет обратиться к объекту (1-ая переменная в функциях внутри класса,слово мб любое
-        if not isinstance(mu, float) or not isinstance(sigma, float):    # если атрибут не является типом str
-            raise TypeError   # выдаст ошибку и код упадет напишет тип ошибки. TypeError - класс ошибки. Если скобки то это объект класса
-        self.mu = mu
-        self.sigma = sigma
-
-    def __float__(self):    # 1 СТАНДАРТНЫЙ ИНТЕРФЕЙС. Получаем случайное число в данный момент (рядом с 10)
-        return gauss(self.mu, self.sigma)
+class CustomFloat:    # создали класс. называем с большой буквы классы. перед классом 2 строки пустые
 
     def __int__(self):
         return int(float(self))
 
     def __add__(self, other):    # Сложение
-        if isinstance(other, RandomFloat):
+        if isinstance(other, CustomFloat):
             other = float(other)
         elif not isinstance(other, (float, int)):
             raise TypeError
         return float(self) + other
 
-    # def __radd__(self, other):    # добавь к объекту справа "ПРАВЕЕ ОПЕРАТОРА"
-    #     return self + other
+    def __radd__(self, other):    # добавь к объекту справа "ПРАВЕЕ ОПЕРАТОРА"
+        return self + other
+
+class RandomFloat(CustomFloat):
+    def __init__(self, mu: float, /, *, sigma: float = 1.):
+        if not isinstance(mu, float) or not isinstance(sigma, float):
+            raise TypeError
+        self.mu = mu
+        self.sigma = sigma
+
+    def __float__(self):
+        return gauss(self.mu, self.sigma)
+
+class EpsilonFloat(CustomFloat):    # в класс кастомфлоат вставить всю домашку прошлую
+    def __init__(self, /, data, *, epsilon=1e-5):
+        # сделать проверку (в тет)
+        self.data = data
+        self.epsilon = epsilon
+
+    def __float__(self):
+        return self.data
+
+    def __eq__(self, other):    # дописать проверку
+        ...
 
     def __mul__(self, other):
         if isinstance(other, RandomFloat):
@@ -33,18 +46,18 @@ class RandomFloat:    # создали класс. называем с боль�
             raise TypeError
         return float(self) * other
 
-    def __rmul__(self, other):
-        return self * other
-
-    def __sub__(self, other):
-        if isinstance(other, RandomFloat):
-            other = float(other)
-        elif not isinstance(other, (float, int)):
-            raise TypeError
-        return float(self) - other
-
-    def __rsub__(self, other):
-        return -(self - other)
+# def __rmul__(self, other):
+#     return self * other
+#
+# def __sub__(self, other):
+#     if isinstance(other, RandomFloat):
+#         other = float(other)
+#     elif not isinstance(other, (float, int)):
+#         raise TypeError
+#     return float(self) - other
+#
+# def __rsub__(self, other):
+#     return -(self - other)
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ HW @@@@@@@@@@@@@@@@@@@@@@@@@
 
     def __pow__(self, other, modulo=None):
